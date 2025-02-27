@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 
 const SocialLinks = dynamic(() => import('@/app/components/SocialLinks'), { ssr: false });
 
-const COLORS_TOP = ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"];
+// const COLORS_TOP = ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"];
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -70,7 +70,7 @@ const ContactPage = () => {
           Contact Me
         </h2>
         <p data-aos='fade-up' data-aos-duration='1100' className='text-slate-400 max-w-2xl mx-auto text-sm md:text-base mt-2'>
-          Got a question? Send me a message, and I'll get back to you soon.
+          Got a question? Send me a message, and I&aposll get back to you soon.
         </p>
 
         <div className='h-auto py-10 flex items-center justify-center px-[5%] md:px-0' id='Contact'>
