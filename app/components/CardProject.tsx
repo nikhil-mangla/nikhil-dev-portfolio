@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+// import { ArrowRight } from 'lucide-react';
 
 interface CardItemProps {
   Title: string;
@@ -51,7 +51,7 @@ const CardItem: React.FC<CardItemProps> = ({ Title, Description, id }) => {
                   className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/90 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 >
                   <span className="text-sm font-medium">More Info</span>
-                  <ArrowRight className="w-4 h-4" />
+                  {/* <ArrowRight className="w-4 h-4" /> */}
                 </Link>
               ) : (
                 <span className="text-gray-500 text-sm">Details Not Available</span>
