@@ -195,7 +195,13 @@ const Portfolio = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                       {displayedCertificates.map((certificate) => (
                         <div key={certificate.id} data-aos="fade-up" data-aos-duration="1000">
-                          <Image src={certificate.Img} alt={certificate.Title} className="w-full rounded-lg shadow-lg" />
+                          <Image 
+                src={certificate.Img} 
+                alt={certificate.Title} 
+                width={500}  
+                height={300} 
+                className="w-full rounded-lg shadow-lg" 
+              />
                         </div>
                       ))}
                     </div>
