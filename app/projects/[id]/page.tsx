@@ -4,12 +4,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
-  ArrowLeft, ExternalLink, Github, Code2, Star,
-  ChevronRight, Layers, Layout, Globe, Package, Cpu, Code,
+  ArrowLeft, Github, Code2, Star,
+  ChevronRight, Layout, Globe, Package, Cpu, Code,
 } from "lucide-react";
 
 // Import SweetAlert properly for Next.js
-let Swal: any;
+let Swal: typeof import('sweetalert2').default | undefined;
 if (typeof window !== "undefined") {
   // Only import Swal on the client side
   import("sweetalert2").then((module) => {
@@ -202,9 +202,15 @@ export default function ProjectDetails() {
             router.push('/not-found');
           }
         }
-      } catch (err: any) {
+      }  catch (err: unknown) {
         console.error("Error fetching project:", err);
-        setError(err.message || "An error occurred");
+        let errorMessage = "An unknown error occurred";
+        if (err instanceof Error) {
+          errorMessage = err.message;
+        } else if (typeof err === "string") {
+          errorMessage = err;
+        }
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }

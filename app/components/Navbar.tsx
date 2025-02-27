@@ -42,7 +42,7 @@ export const Navbar = () => {
         repeat: Infinity,
         repeatType: "mirror",
     });
-}, []);
+}, [color]);
 
   // Fix: Get string values from MotionTemplate
   const border = useMotionTemplate`1px solid ${color}`;

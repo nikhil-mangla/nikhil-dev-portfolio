@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo} from "react";
 import { motion, useMotionValue, animate, useMotionTemplate } from "framer-motion";
 import Image from "next/image";
 import { Sparkles } from "lucide-react";
@@ -22,25 +22,28 @@ const StatusBadge = React.memo(() => (
     </div>
   </div>
 ));
+StatusBadge.displayName = "StatusBadge";
+
 const MainTitle = React.memo(() => (
-    <div className="space-y-2" data-aos="fade-up" data-aos-delay="600">
-      <h1 className="text-5xl sm:text-6xl md:text-6xl lg:text-6xl xl:text-7xl font-bold tracking-tight">
-        <span className="relative inline-block">
-          <span className="absolute -inset-2 bg-gradient-to-r from-[#6366f1] to-[#a855f7] blur-2xl opacity-20"></span>
-          <span className="relative bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
-            Fullstack&nbsp;
-          </span>
+  <div className="space-y-2" data-aos="fade-up" data-aos-delay="600">
+    <h1 className="text-5xl sm:text-6xl md:text-6xl lg:text-6xl xl:text-7xl font-bold tracking-tight">
+      <span className="relative inline-block">
+        <span className="absolute -inset-2 bg-gradient-to-r from-[#6366f1] to-[#a855f7] blur-2xl opacity-20"></span>
+        <span className="relative bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
+          Fullstack&nbsp;
         </span>
-       
-        <span className="relative inline-block mt-2">
-          <span className="absolute -inset-2 bg-gradient-to-r from-[#6366f1] to-[#a855f7] blur-2xl opacity-20"></span>
-          <span className="relative bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent">
-            Developer
-          </span>
+      </span>
+     
+      <span className="relative inline-block mt-2">
+        <span className="absolute -inset-2 bg-gradient-to-r from-[#6366f1] to-[#a855f7] blur-2xl opacity-20"></span>
+        <span className="relative bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent">
+          Developer
         </span>
-      </h1>
-    </div>
-  ));
+      </span>
+    </h1>
+  </div>
+));
+MainTitle.displayName = "MainTitle";
 
 export const Home = () => {
     const color = useMotionValue(COLORS_TOP[0]);
@@ -52,13 +55,16 @@ export const Home = () => {
             repeat: Infinity,
             repeatType: "mirror",
         });
-    }, []);
+    }, [color]);
 
     const TYPING_SPEED = 100;
     const ERASING_SPEED = 50;
     const PAUSE_DURATION = 2000;
-    const WORDS = ["Computer Science Student", "Tech Enthusiast", "Cloud Computing"];
-
+    const WORDS = useMemo(() => [
+      "Computer Science Student", 
+      "Tech Enthusiast", 
+      "Cloud Computing"
+  ], []);  
     const [isTyping, setIsTyping] = useState(true);
     const [charIndex, setCharIndex] = useState(0);
     const [wordIndex, setWordIndex] = useState(0);
@@ -81,7 +87,7 @@ export const Home = () => {
                 setIsTyping(true);
             }
         }
-    }, [charIndex, isTyping, wordIndex]);
+    }, [charIndex, isTyping, wordIndex, WORDS]);
 
     useEffect(() => {
         const timeout = setTimeout(

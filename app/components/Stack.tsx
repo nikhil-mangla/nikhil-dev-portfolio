@@ -2,8 +2,7 @@ import React, { useEffect } from "react";
 
 import { FaHtml5, FaCss3Alt, FaJs, FaReact, FaPython } from "react-icons/fa";
 import { SiTailwindcss, SiVite, SiAmazon, SiDocker, SiFlutter, SiFirebase, SiMongodb } from "react-icons/si";
-import { IoLogoNodejs } from "react-icons/io";
-import { SiTypescript } from "react-icons/si";
+
 import { TbBrandNextjs } from "react-icons/tb";
 import { motion, animate, useMotionValue, useMotionTemplate } from "framer-motion";
 
@@ -35,7 +34,7 @@ export const Stack = () => {
             repeat: Infinity,
             repeatType: "mirror",
         });
-    }, []);
+    }, [color]);
 
     const backgroundImage = useMotionTemplate`radial-gradient(125% 125% at 50% 0%, #000 50%, ${color})`;
 

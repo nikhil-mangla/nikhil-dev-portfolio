@@ -49,7 +49,7 @@ const ContactPage = () => {
     try {
       await emailjs.send(serviceID, templateID, formData, publicKey);
       setFormData({ name: '', email: '', message: '' });
-      Swal.fire({ title: 'Message sent successfully!', text: "I'll get back to you soon!", icon: 'success' });
+      Swal.fire({ title: 'Message sent successfully!', text: "I&apos;ll get back to you soon!", icon: 'success' });
     } catch (error) {
       console.error('❌ Email sending error:', error);
       Swal.fire({ title: 'Error!', text: 'Error sending email. Please try again.', icon: 'error' });
@@ -71,7 +71,7 @@ const ContactPage = () => {
           Contact Me
         </h2>
         <p data-aos='fade-up' data-aos-duration='1100' className='text-slate-400 max-w-2xl mx-auto text-sm md:text-base mt-2'>
-          Got a question? Send me a message, and I'll get back to you soon.
+          Got a question? Send me a message, and I&aposll get back to you soon.
         </p>
 
         <div className='h-auto py-10 flex items-center justify-center px-[5%] md:px-0' id='Contact'>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ExternalLink, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface CardItemProps {
   Title: string;
@@ -11,14 +11,14 @@ interface CardItemProps {
   id: string;
 }
 
-const CardItem: React.FC<CardItemProps> = ({ Title, Description, LiveLink, id }) => {
-  const handleLiveDemo = (e: React.MouseEvent<HTMLAnchorElement>) => {
+const CardItem: React.FC<CardItemProps> = ({ Title, Description, id }) => {
+  // const handleLiveDemo = (e: React.MouseEvent<HTMLAnchorElement>) => {
     // if (!LiveLink) {
     //   console.log("Live demo link is empty");
     //   e.preventDefault();
     //   alert("Live demo is not available");
     // }
-  };
+  // };
 
   const handleDetails = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!id) {
