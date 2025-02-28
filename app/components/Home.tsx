@@ -155,6 +155,7 @@ export const Home = () => {
   className="flex w-fit items-center gap-2 rounded-full px-4 py-2"
   onClick={() => window.open("https://drive.google.com/file/d/1wBa0l9BPDeA2NQCCuCvINaLaagaUE3Sb/view?usp=sharing", "_blank")}
 >
+
   Download Resume
   <FiArrowRight />
 </motion.button>
