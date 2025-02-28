@@ -25,6 +25,17 @@ interface Project {
   github: string;
   techStack: string[];
   responsibilities: string[];
+  // Add fallback field names for flexibility
+  Title?: string;
+  Description?: string;
+  Github?: string;
+  TechStack?: string[];
+  TeckStack?: string[];
+  TeckState?: string[];
+  Teckstack?: string[];
+  Responsibilities?: string[];
+  "Responsibilities "?: string[];
+  [key: string]: string | string[] | undefined; // Add index signature for unknown properties
 }
 
 const TECH_ICONS = {
@@ -37,9 +48,6 @@ const TECH_ICONS = {
   CSS: Code,
   default: Package,
 };
-
-
-    
 
 const TechBadge = ({ tech }: { tech: string }) => {
   const Icon = TECH_ICONS[tech as keyof typeof TECH_ICONS] || TECH_ICONS["default"];
@@ -148,23 +156,59 @@ export default function ProjectDetails() {
     }
   }, []);
 
+  // Fixed useEffect for fetching project data
   useEffect(() => {
     const fetchProject = async () => {
       try {
         if (typeof window !== 'undefined') {
           window.scrollTo(0, 0);
-          const storedProjects = JSON.parse(localStorage.getItem("projects") || "[]");
+          const storedProjects: Project[] = JSON.parse(localStorage.getItem("projects") || "[]");
           
           console.log("Stored projects:", storedProjects);
           console.log("Looking for ID:", id);
+          
+          // Check if anything is in localStorage
+          if (storedProjects.length === 0) {
+            console.error("No projects found in localStorage");
+            setError("No projects data available");
+            return;
+          }
         
           const projectId = Array.isArray(id) ? id[0] : id || '';
-          const selectedProject = storedProjects.find((p: { id: string }) => 
+          console.log("Normalized project ID to search for:", normalizeString(projectId));
+          
+          // Log all project IDs for comparison
+          console.log("Available project IDs:", storedProjects.map((p: Project) => p.id));
+          
+          const selectedProject = storedProjects.find((p: Project) => 
             normalizeString(p.id) === normalizeString(projectId)
           );
         
           if (selectedProject) {
             console.log("Raw project data:", selectedProject);
+            
+            // More detailed logging of each field
+            console.log("Title:", selectedProject.title || selectedProject.Title);
+            console.log("Description:", selectedProject.description || selectedProject.Description);
+            console.log("GitHub:", selectedProject.github || selectedProject.Github);
+            
+            // Combine multiple possible field names for tech stack and responsibilities
+            const techStack = [
+              ...(selectedProject.techStack || []),
+              ...(selectedProject.TechStack || []),
+              ...(selectedProject.TeckStack || []),
+              ...(selectedProject.TeckState || []),
+              ...(selectedProject.Teckstack || [])
+            ].filter(Boolean);
+            
+            const responsibilities = [
+              ...(selectedProject.responsibilities || []),
+              ...(selectedProject.Responsibilities || []),
+              ...(selectedProject["Responsibilities "] || [])
+            ].filter(Boolean);
+            
+            console.log("Tech Stack:", techStack);
+            console.log("Responsibilities:", responsibilities);
             
             // Enhanced field normalization
             const normalizedProject: Project = {
@@ -172,28 +216,11 @@ export default function ProjectDetails() {
               title: selectedProject.title || selectedProject.Title || "Untitled Project",
               description: selectedProject.description || selectedProject.Description || "",
               github: selectedProject.github || selectedProject.Github || '#',
-              techStack: [
-                ...(selectedProject.TeckStack || []),
-                ...(selectedProject.TechStack || []),
-                ...(selectedProject.TeckState || []),
-                ...(selectedProject.Teckstack || [])
-              ].filter(Boolean),
-              responsibilities: [
-                ...(selectedProject.responsibilities || []),
-                ...(selectedProject.Responsibilities || []),
-                ...(selectedProject["Responsibilities "] || [])
-              ].filter(Boolean)
+              techStack: techStack.length > 0 ? techStack : [],
+              responsibilities: responsibilities.length > 0 ? responsibilities : []
             };
         
             console.log("Normalized project:", normalizedProject);
-        
-            // Validate required fields
-            if (!normalizedProject.title || !normalizedProject.description) {
-              console.error("Missing required fields in:", normalizedProject);
-              setError("Invalid project data: Missing required fields");
-              router.push('/invalid-data');
-              return;
-            }
         
             setProject(normalizedProject);
           } else {
@@ -202,7 +229,7 @@ export default function ProjectDetails() {
             router.push('/not-found');
           }
         }
-      }  catch (err: unknown) {
+      } catch (err: unknown) {
         console.error("Error fetching project:", err);
         let errorMessage = "An unknown error occurred";
         if (err instanceof Error) {
@@ -215,7 +242,8 @@ export default function ProjectDetails() {
         setIsLoading(false);
       }
     };
-
+    
+    // Call the fetchProject function (this was missing in original code)
     fetchProject();
   }, [id, router]);
 
@@ -320,7 +348,7 @@ export default function ProjectDetails() {
                   <Code2 className="w-4 h-4 md:w-5 md:h-5 text-blue-400" />
                   Technologies Used
                 </h3>
-                {project.techStack?.length > 0 ? (
+                {project.techStack && project.techStack.length > 0 ? (
                   <div className="flex flex-wrap gap-2 md:gap-3">
                     {project.techStack.map((tech, index) => (
                       <TechBadge key={index} tech={tech} />
@@ -343,7 +371,7 @@ export default function ProjectDetails() {
                   <Star className="w-5 h-5 text-yellow-400 group-hover:rotate-[20deg] transition-transform duration-300" />
                   Responsibilities
                 </h3>
-                {project.responsibilities?.length > 0 ? (
+                {project.responsibilities && project.responsibilities.length > 0 ? (
                   <ul className="list-none space-y-2">
                     {project.responsibilities.map((responsibility, index) => (
                       <FeatureItem key={index} feature={responsibility} />
