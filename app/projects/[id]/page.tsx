@@ -7,17 +7,18 @@ import {
   ArrowLeft, Github, Code2, Star,
   ChevronRight, Layout, Globe, Package, Cpu, Code,
 } from "lucide-react";
+import { db } from "@/app/firebase"; // Adjust path to your Firebase config
+import { doc, getDoc } from "firebase/firestore";
 
-// Import SweetAlert properly for Next.js
+// SweetAlert2 import
 let Swal: typeof import('sweetalert2').default | undefined;
 if (typeof window !== "undefined") {
-  // Only import Swal on the client side
   import("sweetalert2").then((module) => {
     Swal = module.default;
   });
 }
 
-// Add interface for project data
+// Interface for project data
 interface Project {
   id: string;
   title: string;
@@ -25,7 +26,6 @@ interface Project {
   github: string;
   techStack: string[];
   responsibilities: string[];
-  // Add fallback field names for flexibility
   Title?: string;
   Description?: string;
   Github?: string;
@@ -35,7 +35,7 @@ interface Project {
   Teckstack?: string[];
   Responsibilities?: string[];
   "Responsibilities "?: string[];
-  [key: string]: string | string[] | undefined; // Add index signature for unknown properties
+  [key: string]: string | string[] | undefined;
 }
 
 const TECH_ICONS = {
@@ -46,6 +46,11 @@ const TECH_ICONS = {
   Javascript: Code,
   HTML: Code,
   CSS: Code,
+  Flask: Package,
+  OpenCV: Package,
+  MediaPipe: Package,
+  "TensorFlow/Keras": Package,
+  Firebase: Package,
   default: Package,
 };
 
@@ -85,7 +90,6 @@ const ProjectStats = ({ project }: { project: Project }) => {
   return (
     <div className="grid grid-cols-2 gap-3 md:gap-4 p-3 md:p-4 bg-[#0a0a1a] rounded-xl overflow-hidden relative">
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20 opacity-50 blur-2xl z-0" />
-
       <div className="relative z-10 flex items-center space-x-2 md:space-x-3 bg-white/5 p-2 md:p-3 rounded-lg border border-blue-500/20 transition-all duration-300 hover:scale-105 hover:border-blue-500/50 hover:shadow-lg">
         <div className="bg-blue-500/20 p-1.5 md:p-2 rounded-full">
           <Code2 className="text-blue-300 w-4 h-4 md:w-6 md:h-6" strokeWidth={1.5} />
@@ -100,16 +104,16 @@ const ProjectStats = ({ project }: { project: Project }) => {
 };
 
 const handleGithubClick = (githubLink: string) => {
-  if (githubLink === 'Private') {
+  if (!githubLink || githubLink === '#' || githubLink === 'Private') {
     if (typeof Swal !== 'undefined') {
       Swal.fire({
         icon: 'info',
-        title: 'Source Code Private',
-        text: 'Maaf, source code untuk proyek ini bersifat privat.',
-        confirmButtonText: 'Mengerti',
+        title: 'Source Code Unavailable',
+        text: 'Sorry, the source code for this project is not available.',
+        confirmButtonText: 'Got it',
         confirmButtonColor: '#3085d6',
         background: '#030014',
-        color: '#ffffff'
+        color: '#ffffff',
       });
     }
     return false;
@@ -117,7 +121,6 @@ const handleGithubClick = (githubLink: string) => {
   return true;
 };
 
-// Error component for Next.js error handling
 const ErrorComponent = () => {
   const router = useRouter();
   
@@ -144,9 +147,6 @@ export default function ProjectDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Helper function for string normalization
-  const normalizeString = (str: string) => str.toLowerCase().trim();
-
   useEffect(() => {
     // Load SweetAlert2 if not already loaded
     if (typeof window !== "undefined" && !Swal) {
@@ -154,96 +154,66 @@ export default function ProjectDetails() {
         Swal = module.default;
       });
     }
-  }, []);
 
-  // Fixed useEffect for fetching project data
-  useEffect(() => {
     const fetchProject = async () => {
       try {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           window.scrollTo(0, 0);
-          const storedProjects: Project[] = JSON.parse(localStorage.getItem("projects") || "[]");
-          
-          console.log("Stored projects:", storedProjects);
-          console.log("Looking for ID:", id);
-          
-          // Check if anything is in localStorage
-          if (storedProjects.length === 0) {
-            console.error("No projects found in localStorage");
-            setError("No projects data available");
-            return;
-          }
-        
           const projectId = Array.isArray(id) ? id[0] : id || '';
-          console.log("Normalized project ID to search for:", normalizeString(projectId));
-          
-          // Log all project IDs for comparison
-          console.log("Available project IDs:", storedProjects.map((p: Project) => p.id));
-          
-          const selectedProject = storedProjects.find((p: Project) => 
-            normalizeString(p.id) === normalizeString(projectId)
-          );
-        
-          if (selectedProject) {
-            console.log("Raw project data:", selectedProject);
-            
-            // More detailed logging of each field
-            console.log("Title:", selectedProject.title || selectedProject.Title);
-            console.log("Description:", selectedProject.description || selectedProject.Description);
-            console.log("GitHub:", selectedProject.github || selectedProject.Github);
-            
-            // Combine multiple possible field names for tech stack and responsibilities
+          // Preserve hyphen in ID to match Firestore
+          const normalizedId = projectId;
+
+          // Fetch from Firestore
+          const docRef = doc(db, "projects", normalizedId); // Assumes collection name is "projects"
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const selectedProject = { id: docSnap.id, ...docSnap.data() } as Project;
+            console.log("Raw Firestore data:", selectedProject);
+
+            // Normalize fields, trim whitespace from tech stack
             const techStack = [
-              ...(selectedProject.techStack || []),
-              ...(selectedProject.TechStack || []),
-              ...(selectedProject.TeckStack || []),
-              ...(selectedProject.TeckState || []),
-              ...(selectedProject.Teckstack || [])
+              ...(selectedProject.techStack || []).map((tech: string) => tech.trim()),
+              ...(selectedProject.TechStack || []).map((tech: string) => tech.trim()),
+              ...(selectedProject.TeckStack || []).map((tech: string) => tech.trim()),
+              ...(selectedProject.TeckState || []).map((tech: string) => tech.trim()),
+              ...(selectedProject.Teckstack || []).map((tech: string) => tech.trim()),
+              // ...(selectedProject.echStack || []).map((tech: string) => tech.trim()),
             ].filter(Boolean);
-            
+
             const responsibilities = [
               ...(selectedProject.responsibilities || []),
               ...(selectedProject.Responsibilities || []),
-              ...(selectedProject["Responsibilities "] || [])
+              ...(selectedProject["Responsibilities "] || []),
             ].filter(Boolean);
-            
-            console.log("Tech Stack:", techStack);
-            console.log("Responsibilities:", responsibilities);
-            
-            // Enhanced field normalization
+
             const normalizedProject: Project = {
               id: selectedProject.id,
               title: selectedProject.title || selectedProject.Title || "Untitled Project",
               description: selectedProject.description || selectedProject.Description || "",
-              github: selectedProject.github || selectedProject.Github || '#',
+              github: selectedProject.github || selectedProject.Github || "#",
               techStack: techStack.length > 0 ? techStack : [],
-              responsibilities: responsibilities.length > 0 ? responsibilities : []
+              responsibilities: responsibilities.length > 0 ? responsibilities : [],
             };
-        
+
             console.log("Normalized project:", normalizedProject);
-        
             setProject(normalizedProject);
           } else {
-            console.warn("Project not found!");
+            console.warn("Project not found in Firestore!");
             setError("Project not found");
             router.push('/not-found');
           }
         }
       } catch (err: unknown) {
-        console.error("Error fetching project:", err);
+        console.error("Error fetching project from Firestore:", err);
         let errorMessage = "An unknown error occurred";
-        if (err instanceof Error) {
-          errorMessage = err.message;
-        } else if (typeof err === "string") {
-          errorMessage = err;
-        }
+        if (err instanceof Error) errorMessage = err.message;
         setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
     };
-    
-    // Call the fetchProject function (this was missing in original code)
+
     fetchProject();
   }, [id, router]);
 
@@ -268,7 +238,6 @@ export default function ProjectDetails() {
         <div className="text-center space-y-4 text-red-400">
           <h2 className="text-xl">Invalid Project Data</h2>
           <p className="text-sm">Missing required fields</p>
-          
           <button
             className="border px-4 py-2 rounded-lg hover:bg-white/10"
             onClick={() => router.back()}
