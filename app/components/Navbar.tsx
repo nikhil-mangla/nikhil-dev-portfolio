@@ -1,19 +1,27 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { motion, useMotionValue, useMotionTemplate, animate } from "framer-motion";
 
+// Define SectionId type (consistent with app/page.tsx)
+type SectionId = "home" | "portfolio" | "techstack" | "contact";
+
+// Define props interface
+interface NavbarProps {
+  onNavClick: (sectionId: SectionId) => void;
+}
+
 const navLinks = [
-  { title: "Home", path: "/#home" },
-  { title: "Portfolio", path: "/#portfolio" },
-  { title: "Techstack", path: "/#techstack" },
-  { title: "Contact", path: "/#contact" },
+  { title: "Home", path: "/#home", id: "home" as SectionId },
+  { title: "Portfolio", path: "/#portfolio", id: "portfolio" as SectionId },
+  { title: "Techstack", path: "/#techstack", id: "techstack" as SectionId },
+  { title: "Contact", path: "/#contact", id: "contact" as SectionId },
 ];
 
 const COLORS_TOP = ["#13FFAA", "#1E67C6", "#CE84CF", "#DD335C"];
 
-export const Navbar = () => {
+export const Navbar = ({ onNavClick }: NavbarProps) => {
   const color = useMotionValue(COLORS_TOP[0]);
   const [nav, setNav] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
@@ -26,7 +34,7 @@ export const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setShowNavbar(currentScrollY < lastScrollY);
+      setShowNavbar(currentScrollY < lastScrollY || currentScrollY < 50); // Show navbar near top
       setLastScrollY(currentScrollY);
     };
 
@@ -37,16 +45,20 @@ export const Navbar = () => {
   // Update color dynamically
   useEffect(() => {
     animate(color, COLORS_TOP, {
-        ease: "easeInOut",
-        duration: 10,
-        repeat: Infinity,
-        repeatType: "mirror",
+      ease: "easeInOut",
+      duration: 10,
+      repeat: Infinity,
+      repeatType: "mirror",
     });
-}, [color]);
+  }, [color]);
 
-  // Fix: Get string values from MotionTemplate
   const border = useMotionTemplate`1px solid ${color}`;
   const boxShadow = useMotionTemplate`0px 4px 24px ${color}`;
+
+  const handleClick = (sectionId: SectionId) => {
+    onNavClick(sectionId); // Trigger the scroll function from app/page.tsx
+    closeNav(); // Close mobile menu if open
+  };
 
   return (
     <motion.section
@@ -55,9 +67,9 @@ export const Navbar = () => {
       }`}
     >
       {/* Desktop Navbar */}
-      <motion.section 
+      <motion.section
         className="border border-white/20 mt-8 backdrop-blur-3xl rounded-3xl hidden md:flex items-center justify-center p-2 max-w-[400px] mx-auto font-bold"
-        style={{ border: border.get(), boxShadow: boxShadow.get() }}
+        style={{ border, boxShadow }}
       >
         <ul className="flex flex-row p-2 space-x-8">
           {navLinks.map((link, index) => (
@@ -65,7 +77,12 @@ export const Navbar = () => {
               key={index}
               className="transform hover:text-white/50 transition-all duration-300 ease-in-out"
             >
-              <Link href={link.path}>{link.title}</Link>
+              <button
+                onClick={() => handleClick(link.id)}
+                className="text-white"
+              >
+                {link.title}
+              </button>
             </li>
           ))}
         </ul>
@@ -88,9 +105,12 @@ export const Navbar = () => {
         <ul className="flex flex-col items-center justify-center space-y-8 h-full">
           {navLinks.map((link, index) => (
             <li key={index}>
-              <Link href={link.path} onClick={closeNav} className="text-5xl">
+              <button
+                onClick={() => handleClick(link.id)}
+                className="text-5xl text-white"
+              >
                 {link.title}
-              </Link>
+              </button>
             </li>
           ))}
         </ul>
