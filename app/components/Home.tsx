@@ -112,6 +112,13 @@ export const Home = () => {
                 <h1 className="max-w-3xl bg-gradient-to-br from-white to-gray-400 bg-clip-text font-black leading-tight text-transparent text-5xl md:text-7xl">
                     Nikhil Mangla
                 </h1>
+           <div className="z-10 flex flex-col items-center text-center">
+                <span className="relative inline-block group">
+                    <span className="absolute -inset-0.5 bg-gradient-to-r from-[#6366f1] to-[#a855f7] rounded-full blur opacity-30 group-hover:opacity-50 transition duration-1000"></span>
+                    <span className="relative mb-1.5 inline-block rounded-full bg-black/40 backdrop-blur-xl border border-white/10 px-3 py-1.5 text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]">
+                        Open for work
+                    </span>
+                </span>
 
                 <div className="mt-4">
                     <Image
@@ -122,13 +129,7 @@ export const Home = () => {
                         className="rounded-full"
                     />
                 </div>
-            <div className="z-10 flex flex-col items-center text-center">
-                <span className="relative inline-block group">
-                    <span className="absolute -inset-0.5 bg-gradient-to-r from-[#6366f1] to-[#a855f7] rounded-full blur opacity-30 group-hover:opacity-50 transition duration-1000"></span>
-                    <span className="relative mb-1.5 inline-block rounded-full bg-black/40 backdrop-blur-xl border border-white/10 px-3 py-1.5 text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]">
-                        Open for work
-                    </span>
-                </span>
+           
 
                 <div className="mt-6">
                     <StatusBadge />
